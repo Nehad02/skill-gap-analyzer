@@ -10,11 +10,14 @@ st.title("💡 Smart Skill Gap Analyzer + Career Predictor")
 # Load dataset
 data = pd.read_csv("job_dataset.csv")
 
-# ---- CLEAN SKILLS ----
+# fix null values
+data = data.dropna(subset=['Skills', 'Title'])
+data['Title'] = data['Title'].astype(str)
+
+# clean skills
 data['Skills'] = data['Skills'].astype(str).str.lower()
 data['Skills'] = data['Skills'].apply(lambda x: x.split(';'))
 data['Skills'] = data['Skills'].apply(lambda x: [i.strip() for i in x if i != '' and i != 'nan'])
-
 # Remove empty
 data = data[data['Skills'].apply(len) > 0]
 
