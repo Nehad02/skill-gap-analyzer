@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Quizlytics Quiz</title>
+  <script>
+    function recordOption(qid) {
+      var startInput = document.getElementById("start" + qid);
+      var swapInput = document.getElementById("swaps" + qid);
+      if (!startInput.value) {
+        startInput.value = Date.now();
+        swapInput.value = 0;
+      } else {
+        swapInput.value = parseInt(swapInput.value) + 1;
+      }
+    }
+
+    function recordTime(qid) {
+      var startInput = document.getElementById("start" + qid);
+      var timeInput = document.getElementById("time" + qid);
+      if (startInput.value) {
+        timeInput.value = Date.now() - parseInt(startInput.value);
+      }
+    }
+
+    function prepareSubmission() {
+      var num_questions = {{ questions|length }};
+      for (var i = 0; i < num_questions; i++) {
+        recordTime(i);
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>Quizlytics Quiz</h1>
+  <form action="/result" method="post" onsubmit="prepareSubmission();">
+    {% for i in range(questions|length) %}
+    <div class="question">
+      <p><strong>{{ i+1 }}. {{ questions[i] }} ({{ difficulty[i] }})</strong></p>
+      <div class="options">
+        {% for option in options[i] %}
+          <label>
+            <input type="radio" name="question{{ i }}" value="{{ option }}" onclick="recordOption({{ i }});">
+            {{ option }}
+          </label>
+        {% endfor %}
+      </div>
+      <input type="hidden" id="start{{ i }}" name="start{{ i }}" value="">
+      <input type="hidden" id="time{{ i }}" name="time{{ i }}" value="0">
+      <input type="hidden" id="swaps{{ i }}" name="swaps{{ i }}" value="0">
+    </div>
+    <hr>
+    {% endfor %}
+    <button type="submit">Submit Quiz</button>
+  </form>
+</body>
+</html>
